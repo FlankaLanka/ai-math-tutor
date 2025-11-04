@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "katex": "^0.16.9",
-    "konva": "^10.0.8",
+    "konva": "^9.2.0",
     "openai": "^4.20.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
