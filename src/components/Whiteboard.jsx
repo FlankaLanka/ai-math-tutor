@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Stage, Layer, Image as KonvaImage, Line, Group, Transformer, Rect } from 'react-konva';
 import useImage from 'use-image';
+import { PenIcon, ResetIcon } from './Icons';
 
 /**
  * Whiteboard Component
@@ -286,14 +287,16 @@ const Whiteboard = forwardRef(function Whiteboard({
             }`}
             title={penToolEnabled ? "Disable pen tool" : "Enable pen tool"}
           >
-            {penToolEnabled ? '✏️ Pen On' : '✏️ Pen Off'}
+            <PenIcon className="w-4 h-4 inline mr-1" />
+            <span>{penToolEnabled ? 'Pen On' : 'Pen Off'}</span>
           </button>
           <button
             onClick={handleReset}
             className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-xs font-semibold sketch-border-sm sketch-shadow-sm transition-colors"
             title="Reset: remove image and drawings, then place new image at starting position"
           >
-            🔄 Reset
+            <ResetIcon className="w-4 h-4 inline mr-1" />
+            <span>Reset</span>
           </button>
         </div>
       </div>

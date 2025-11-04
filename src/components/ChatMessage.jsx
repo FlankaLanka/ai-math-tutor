@@ -1,6 +1,7 @@
 import { InlineMath, BlockMath } from 'react-katex'
 import 'katex/dist/katex.min.css'
 import Avatar from './Avatar'
+import { TutorIcon, UserIcon, CameraIcon } from './Icons'
 
 function ChatMessage({ role, content, animation, audioLevel = 0, isMostRecent = false }) {
   const isTutor = role === 'assistant'
@@ -117,10 +118,21 @@ function ChatMessage({ role, content, animation, audioLevel = 0, isMostRecent = 
         }`}
       >
         <div className="text-sm font-semibold mb-2 flex items-center gap-2">
-          {isTutor ? '🧑‍🏫 Tutor' : '👤 You'}
+          {isTutor ? (
+            <>
+              <TutorIcon className="w-5 h-5" />
+              <span>Tutor</span>
+            </>
+          ) : (
+            <>
+              <UserIcon className="w-5 h-5" />
+              <span>You</span>
+            </>
+          )}
           {imageUrl && !isTutor && (
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
-              📷 Image attached
+            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+              <CameraIcon className="w-3 h-3" />
+              Image attached
             </span>
           )}
         </div>

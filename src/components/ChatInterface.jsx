@@ -7,6 +7,7 @@ import VoiceInterface from './VoiceInterface'
 import Avatar from './Avatar'
 import Whiteboard from './Whiteboard'
 import { API_ENDPOINTS } from '../config/api.js'
+import { CameraIcon } from './Icons'
 
 function ChatInterface({ problem, problemImage, conversationHistory, setConversationHistory, onNewProblem }) {
   const [input, setInput] = useState('')
@@ -17,6 +18,7 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
   const [avatarAnimation, setAvatarAnimation] = useState('idle')
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [audioLevel, setAudioLevel] = useState(0) // Audio level for animation
+  const [whiteboardCaptureEnabled, setWhiteboardCaptureEnabled] = useState(true) // Default to enabled
   const [stuckInfo, setStuckInfo] = useState({ isStuck: false, stuckCount: 0, reason: 'Student is progressing normally' })
   const [previousStuckState, setPreviousStuckState] = useState(false)
 
@@ -208,9 +210,9 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
     setLatestTutorMessage('') // Clear previous message to prevent speaking old content
     setAvatarAnimation('idle') // Static while waiting for response
 
-    // Capture whiteboard snapshot if available
+    // Capture whiteboard snapshot if available and enabled
       let whiteboardSnapshot = null
-      if (whiteboardRef.current) {
+      if (whiteboardCaptureEnabled && whiteboardRef.current) {
         const snapshot = await whiteboardRef.current.getSnapshot()
         if (snapshot) {
           whiteboardSnapshot = snapshot
@@ -346,7 +348,10 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
             <div className="flex-1 sketch-box bg-blue-50 p-3 flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-blue-700">📷 Problem Image</span>
+                  <span className="text-xs font-semibold text-blue-700 flex items-center gap-1">
+                    <CameraIcon className="w-4 h-4" />
+                    Problem Image
+                  </span>
                 </div>
                 <button
                   onClick={() => setReferenceImage(null)}
@@ -424,6 +429,8 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
         isLoading={isLoading}
         onImageAttach={handleImageAttach}
         attachedImage={attachedImage}
+        whiteboardCaptureEnabled={whiteboardCaptureEnabled}
+        onWhiteboardCaptureToggle={() => setWhiteboardCaptureEnabled(!whiteboardCaptureEnabled)}
       />
 
       {/* Whiteboard - Underneath chat */}

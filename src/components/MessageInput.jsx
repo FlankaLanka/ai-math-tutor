@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
+import { CameraIcon, WhiteboardIcon, CheckIcon } from './Icons'
 
-function MessageInput({ input, setInput, onSendMessage, isLoading, onImageAttach, attachedImage: externalAttachedImage = null }) {
+function MessageInput({ input, setInput, onSendMessage, isLoading, onImageAttach, attachedImage: externalAttachedImage = null, whiteboardCaptureEnabled, onWhiteboardCaptureToggle }) {
   const fileInputRef = useRef(null)
   const [attachedImage, setAttachedImage] = useState(null)
   
@@ -61,7 +62,10 @@ function MessageInput({ input, setInput, onSendMessage, isLoading, onImageAttach
         <div className="relative inline-block">
           <div className="sketch-box bg-blue-50 p-2">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-semibold text-blue-700">📷 Image attached</span>
+              <span className="text-sm font-semibold text-blue-700 flex items-center gap-1">
+                <CameraIcon className="w-4 h-4" />
+                Image attached
+              </span>
               <span className="text-xs text-gray-600">(Tutor will see this)</span>
             </div>
             <div className="relative">
@@ -94,10 +98,10 @@ function MessageInput({ input, setInput, onSendMessage, isLoading, onImageAttach
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="px-4 py-4 bg-gray-200 hover:bg-gray-300 font-semibold sketch-border-sm sketch-shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-4 bg-gray-200 hover:bg-gray-300 font-semibold sketch-border-sm sketch-shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           title="Attach image"
         >
-          📷
+          <CameraIcon className="w-5 h-5" />
         </button>
         <input
           type="text"
@@ -107,6 +111,25 @@ function MessageInput({ input, setInput, onSendMessage, isLoading, onImageAttach
           className="flex-1 p-4 focus:outline-none focus:border-blue-500 sketch-box text-base"
           disabled={isLoading}
         />
+        {/* Whiteboard capture toggle */}
+        {onWhiteboardCaptureToggle && (
+          <button
+            type="button"
+            onClick={onWhiteboardCaptureToggle}
+            disabled={isLoading}
+            className={`px-4 py-4 font-semibold sketch-border-sm sketch-shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center ${
+              whiteboardCaptureEnabled
+                ? 'bg-green-200 hover:bg-green-300 text-green-800'
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+            }`}
+            title={whiteboardCaptureEnabled ? "Whiteboard capture enabled - click to disable" : "Whiteboard capture disabled - click to enable"}
+          >
+            <WhiteboardIcon className="w-5 h-5" />
+            {whiteboardCaptureEnabled && (
+              <CheckIcon className="w-3 h-3 ml-1" />
+            )}
+          </button>
+        )}
         <button
           type="submit"
           disabled={(!input.trim() && !displayImage) || isLoading}

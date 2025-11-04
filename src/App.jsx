@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ChatInterface from './components/ChatInterface'
 import ProblemInput from './components/ProblemInput'
+import { MathIcon } from './components/Icons'
 
 function App() {
   const [currentProblem, setCurrentProblem] = useState(null)
@@ -23,9 +24,10 @@ function App() {
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <header className="text-center mb-6">
-          <h1 className="text-5xl font-bold mb-2 inline-block">
-            <span className="sketch-border bg-white px-6 py-3 inline-block sketch-shadow-sm">
-              🧮 AI Math Tutor
+          <h1 className="text-5xl font-bold mb-2">
+            <span className="sketch-border bg-white px-6 py-3 inline-flex items-center justify-center gap-3 sketch-shadow-sm">
+              <MathIcon className="w-10 h-10" />
+              <span>AI Math Tutor</span>
             </span>
           </h1>
           <p className="text-xl text-gray-700 mt-3 font-medium">

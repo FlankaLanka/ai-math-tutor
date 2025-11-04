@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { MicrophoneIcon, SpeakerOnIcon, SpeakerOffIcon } from './Icons';
 import { API_ENDPOINTS } from '../config/api.js';
 
 /**
@@ -507,9 +508,7 @@ function VoiceInterface({
           }`}
           title={isListening ? 'Listening... Click to stop' : 'Toggle voice input'}
         >
-          <span className="text-lg">
-            {isListening ? '🎤' : '🎙️'}
-          </span>
+          <MicrophoneIcon className="w-5 h-5" />
           {isListening && (
             <span className="ml-1 text-xs">...</span>
           )}
@@ -529,9 +528,11 @@ function VoiceInterface({
           }`}
           title={voiceOutputEnabled ? 'Voice output enabled' : 'Voice output disabled'}
         >
-          <span className="text-lg">
-            {isSpeaking ? '🔊' : voiceOutputEnabled ? '🔊' : '🔇'}
-          </span>
+          {isSpeaking || voiceOutputEnabled ? (
+            <SpeakerOnIcon className="w-5 h-5" />
+          ) : (
+            <SpeakerOffIcon className="w-5 h-5" />
+          )}
         </button>
         
         {/* Volume Slider */}

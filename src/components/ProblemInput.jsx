@@ -95,7 +95,11 @@ function ProblemInput({ onProblemSubmit }) {
                 onClick={() => setShowImageUpload(true)}
                 className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 font-semibold sketch-border-sm sketch-shadow-sm transition-colors"
               >
-                📷 Upload Problem Image
+                <svg className="w-5 h-5 inline mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                  <circle cx="12" cy="13" r="3" />
+                </svg>
+                Upload Problem Image
               </button>
             ) : (
               <div className="space-y-3">
