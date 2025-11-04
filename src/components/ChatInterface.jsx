@@ -5,6 +5,7 @@ import ChatMessage from './ChatMessage'
 import MessageInput from './MessageInput'
 import VoiceInterface from './VoiceInterface'
 import Avatar from './Avatar'
+import Whiteboard from './Whiteboard'
 import { API_ENDPOINTS } from '../config/api.js'
 
 function ChatInterface({ problem, problemImage, conversationHistory, setConversationHistory, onNewProblem }) {
@@ -126,6 +127,7 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
   }
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
+  const whiteboardRef = useRef(null)
 
   // Auto-scroll the messages container (not the whole page) when new messages arrive
   useEffect(() => {
@@ -206,6 +208,15 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
     setLatestTutorMessage('') // Clear previous message to prevent speaking old content
     setAvatarAnimation('idle') // Static while waiting for response
 
+    // Capture whiteboard snapshot if available
+      let whiteboardSnapshot = null
+      if (whiteboardRef.current) {
+        const snapshot = await whiteboardRef.current.getSnapshot()
+        if (snapshot) {
+          whiteboardSnapshot = snapshot
+        }
+      }
+
     // Save image as reference if this is the first image in conversation
     if (imageToSend && !referenceImage) {
       setReferenceImage(imageToSend)
@@ -225,6 +236,9 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
       // Reference image will be handled by backend from conversation history
       const imageToInclude = imageToSend || null; // Only send new images, not reference
       
+      // Send whiteboard snapshot if available (prefer whiteboard over newly attached image for context)
+      const imageForContext = whiteboardSnapshot || imageToInclude;
+      
       const response = await fetch(API_ENDPOINTS.chat, {
         method: 'POST',
         headers: {
@@ -232,7 +246,8 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
         },
         body: JSON.stringify({
           message: userMessage,
-          image: imageToInclude, // Only new images, reference image comes from history
+          image: imageForContext, // Whiteboard snapshot or new image
+          whiteboard: whiteboardSnapshot ? true : false, // Flag to indicate this is a whiteboard snapshot
           conversationHistory: conversationHistory,
           problem: problem
         })
@@ -359,7 +374,7 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
       {/* Messages - Larger chat container */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto mb-4 space-y-4 p-8 bg-white sketch-box min-h-0"
+        className="flex-1 overflow-y-auto mb-4 space-y-4 p-8 bg-white sketch-box min-h-[600px]"
       >
         {conversationHistory.map((msg, index) => {
           const isMostRecent = index === conversationHistory.length - 1 && msg.role === 'assistant'
@@ -410,6 +425,14 @@ function ChatInterface({ problem, problemImage, conversationHistory, setConversa
         onImageAttach={handleImageAttach}
         attachedImage={attachedImage}
       />
+
+      {/* Whiteboard - Underneath chat */}
+      <div className="mt-4">
+        <Whiteboard
+          ref={whiteboardRef}
+          problemImage={referenceImage}
+        />
+      </div>
     </div>
   )
 }

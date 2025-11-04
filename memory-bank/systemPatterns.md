@@ -22,12 +22,20 @@ Storage (localStorage on client)
   - Hand-drawn borders, organic shapes, playful design
   - Sketch-style components (buttons, inputs, cards, chat bubbles)
 - **Math Renderer**: KaTeX for LaTeX rendering (user messages, tutor responses, problem display)
+- **Whiteboard**: Konva.js-based drawing canvas with pen tool and image overlay
+- **Voice Interface**: OpenAI TTS API and Web Speech API for speech input/output
+- **Avatar**: Animated 2D character with speaking animation synced to audio
 - **API Communication**: Makes HTTP requests to Express backend API
 - **Responsibilities**:
   - Display conversation history (tutor vs student) with sketch-style chat bubbles
   - Handle text input and image uploads with hand-drawn UI elements
-  - Make API calls to backend endpoints (`/api/chat`, `/api/vision`, `/api/validate`)
+  - Whiteboard drawing with pen tool and image overlay
+  - Capture and compress whiteboard snapshots for AI context
+  - Voice input/output with toggle controls
+  - Animated avatar synchronized with TTS audio
+  - Make API calls to backend endpoints (`/api/chat`, `/api/vision`, `/api/validate`, `/api/tts`)
   - Render math expressions from LaTeX (supports `$$...$$`, `$...$`, `\[...\]`, `\(...\)`)
+  - Convert LaTeX to natural language for TTS
   - Display reference image next to problem in chat interface
   - Show loading states and OCR previews with playful, sketch-style animations
   - OCR confirmation with image display and LaTeX preview
@@ -36,9 +44,10 @@ Storage (localStorage on client)
 ### 2. Backend API Layer (Express.js)
 - **Server**: Express.js REST API server
 - **API Routes** in `backend/routes/`:
-  - `/api/chat` - Socratic dialogue generation (✅ implemented)
+  - `/api/chat` - Socratic dialogue generation with whiteboard support (✅ implemented)
   - `/api/vision` - Image OCR extraction (✅ implemented)
   - `/api/validate` - Answer validation (✅ implemented)
+  - `/api/tts` - Text-to-speech using OpenAI TTS API (✅ implemented)
 - **Shared Utilities** in `backend/lib/`:
   - `orchestrator.js` - Core Socratic dialogue engine with image context management, stuck detection, output filtering
   - `validation.js` - Answer validation and stuck detection utilities
@@ -46,15 +55,17 @@ Storage (localStorage on client)
 - **Orchestrator**: Core Socratic dialogue engine
   - Builds prompts with conversation context
   - Manages image context (reference image in conversation history)
+  - Handles whiteboard snapshots for visual context
   - Preserves images in conversation history for AI awareness
   - Implements stuck detection and hint escalation logic
   - Enforces "no direct answers" guardrails with output filtering
   - Validates student answers before affirming (strict validation rules)
-  - Model selection: `gpt-4o` for vision, `gpt-4` for text-only
+  - Model selection: `gpt-4o` for vision (images or whiteboard), `gpt-4` for text-only
 - **Conversation Store**: localStorage on client (no server-side storage)
 - **Math Validation Module**: Validates student answers using OpenAI GPT-4 (LLM-as-judge)
 - **Security**: OpenAI API keys stored in backend environment variables (never exposed to client)
 - **CORS**: Configured to allow requests from Vercel frontend URL
+- **Body Size Limits**: Increased to 50MB for large images and whiteboard snapshots
 
 ### 3. OpenAI API Services
 - **GPT-4**: Generates Socratic tutor responses and validates answers
@@ -190,6 +201,28 @@ Every tutor response follows this structure:
 6. Standard text flow continues (via `/api/chat`) with image in conversation history
 7. Reference image displayed in chat interface next to problem
 8. AI maintains visual context through conversation history (not re-sent every message)
+
+### Whiteboard Flow ✅ IMPLEMENTED
+1. User draws on whiteboard using pen tool (Konva.js canvas)
+2. User can overlay problem image on whiteboard (draggable/resizable)
+3. When user sends message, whiteboard snapshot automatically captured
+4. Snapshot compressed (downscaled to 1200px, JPEG 70% quality) to reduce size
+5. Compressed snapshot sent to backend with message
+6. Backend receives whiteboard image with `whiteboard: true` flag
+7. Orchestrator includes whiteboard in GPT-4 Vision context
+8. AI analyzes whiteboard content for visual understanding of student's work
+9. AI provides feedback based on what's actually written on whiteboard
+
+### Voice Interface Flow ✅ IMPLEMENTED
+1. User enables voice input (toggle button)
+2. Web Speech API captures microphone input
+3. Speech converted to text and sent as message
+4. Tutor responds with text
+5. If voice output enabled, text sent to `/api/tts` endpoint
+6. OpenAI TTS API generates audio
+7. Audio played back with volume control
+8. Avatar animation synced to audio levels (Web Audio API monitoring)
+9. LaTeX expressions converted to natural language before TTS
 
 ### Answer Validation Flow (Phase 3) ✅ IMPLEMENTED
 1. Student provides answer (can be validated via `/api/validate` endpoint)

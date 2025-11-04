@@ -98,3 +98,37 @@
     - Add environment variables: `OPENAI_API_KEY`, `FRONTEND_URL`, `PORT`
     - Configure CORS for Vercel frontend URL
 - Optional: Set up database for production (Postgres/Firestore).
+
+## Phase 10 – Interactive Whiteboard
+- Create React component for HTML5 Canvas whiteboard.
+- Implement drawing tools:
+  - Pen tool for freehand drawing
+  - Canvas stroke rendering with mouse/touch events
+  - Sketch-style drawing appearance to match UI aesthetic
+- Implement problem image overlay:
+  - Display uploaded problem image on canvas as texture/background
+  - Allow student to drag and reposition image
+  - Allow student to scale/resize image
+  - Enable drawing over the image
+- Add whiteboard panel underneath chat interface:
+  - Separate scrollable area for whiteboard
+  - Toggle to show/hide whiteboard (optional)
+  - Sketch-style borders and styling
+- Implement automatic snapshot capture:
+  - Capture canvas as image (base64) when student sends message
+  - Send whiteboard snapshot along with text message to backend
+  - Include snapshot in conversation history
+- Update backend `/api/chat` endpoint:
+  - Accept optional whiteboard snapshot image
+  - Pass whiteboard image to orchestrator
+  - Include whiteboard in GPT-4 Vision context for visual understanding
+- Update orchestrator to handle whiteboard images:
+  - Include whiteboard snapshot in conversation history (similar to problem images)
+  - Pass whiteboard to GPT-4 Vision when available
+  - Agent can see but not interact with whiteboard
+- Test whiteboard integration:
+  - Drawing functionality
+  - Image overlay and manipulation
+  - Snapshot capture and transmission
+  - Agent visual context understanding
+- Integrate with sketch-style UI aesthetic.

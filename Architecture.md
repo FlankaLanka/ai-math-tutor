@@ -8,6 +8,7 @@ flowchart LR
         StepViz[Step Visualization<br/>(Animated Breakdown)]
         Voice[Voice Interface<br/>(Text-to-Speech + Speech-to-Text)]
         Avatar[Animated Avatar<br/>(2D/3D Character)]
+        Whiteboard[Whiteboard<br/>(HTML5 Canvas + Drawing Tools)]
     end
 
     subgraph Backend["Express.js Backend API Server"]
@@ -17,6 +18,8 @@ flowchart LR
         MathCheck[Math Validation Module<br/>(OpenAI GPT-4 LLM-as-judge)]
         ProblemGen[Problem Generator<br/>(OpenAI GPT-4)]
     end
+    
+    Whiteboard -->|Snapshot Image| API
 
     subgraph AI["OpenAI API Services"]
         LLM[OpenAI GPT-4<br/>(Socratic Tutor + Validation + Problem Generation)]
@@ -30,6 +33,8 @@ flowchart LR
     UI -->|Display Steps| StepViz
     UI -->|Voice I/O| Voice
     UI -->|Character Display| Avatar
+    UI -->|Whiteboard Snapshot| API
+    Whiteboard -->|Canvas Drawing| UI
 
     API --> Orchestrator
     API --> ConvStore
@@ -43,6 +48,10 @@ flowchart LR
     %% Image-based problems
     API -->|Image| VisionLLM
     VisionLLM -->|Extracted Problem Text| Orchestrator
+    
+    %% Whiteboard snapshots
+    API -->|Whiteboard Image| VisionLLM
+    VisionLLM -->|Visual Context| Orchestrator
 
     %% Answer checking
     Orchestrator --> MathCheck
@@ -70,17 +79,20 @@ flowchart LR
 - **Step Visualization**: Animated breakdown of solution steps with React animations.
 - **Voice Interface**: Text-to-speech (SpeechSynthesis) and speech-to-text (SpeechRecognition) using browser Web Speech API.
 - **Animated Avatar**: 2D/3D tutor character with expressions (Lottie, Three.js, or CSS animations).
+- **Interactive Whiteboard**: HTML5 Canvas-based drawing tool with pen tool, problem image overlay (movable/scalable), and automatic snapshot capture on message send.
 - Displays tutor/student turns and OCR preview with sketch-style UI elements.
 - Makes HTTP requests to backend API endpoints.
+- Captures whiteboard snapshots and sends them with chat messages for agent visual context.
 
 ### Backend API Server (Express.js/Node.js)
 - **Express.js/Node.js** API server for handling OpenAI API calls securely.
 - API routes:
-  - `/api/chat` - Socratic dialogue generation
+  - `/api/chat` - Socratic dialogue generation (accepts text + optional whiteboard snapshot)
   - `/api/vision` - Image OCR extraction
   - `/api/validate` - Answer validation
   - `/api/generate` - Problem generation (similar practice problems)
 - Orchestrator logic (shared utilities) handles prompt construction, hint logic, and conversation context.
+- Orchestrator accepts whiteboard snapshots as image context (similar to problem images).
 - MathCheck validates answers using OpenAI GPT-4 (LLM-as-judge approach).
 - Problem Generator creates similar practice problems using OpenAI GPT-4.
 - ConvStore persists conversation state in localStorage on client (no server-side storage needed).
@@ -88,9 +100,10 @@ flowchart LR
 - **Separate deployment** - Frontend on Vercel, backend on Railway/Render.
 
 ### OpenAI API Services
-- **GPT-4 Vision**: Image → text extraction (OCR from screenshots).
+- **GPT-4 Vision**: Image → text extraction (OCR from screenshots) and visual analysis of whiteboard snapshots.
 - **GPT-4**: Socratic dialogue generation, answer validation (LLM-as-judge), and problem generation.
 - All API calls use OpenAI's standard chat completion and vision APIs.
+- GPT-4 Vision receives whiteboard snapshots as visual context to understand student's drawing/work.
 - API keys managed securely on server-side only.
 
 ### Database / Storage

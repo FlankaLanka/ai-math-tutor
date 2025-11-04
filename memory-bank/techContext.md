@@ -20,6 +20,18 @@
   - Faster, lighter weight
   - LaTeX parsing from GPT-4 responses
   - Integrated with react-katex
+- **Whiteboard**: ✅ **Konva.js** (react-konva)
+  - 2D canvas library for drawing tools
+  - Pen tool for freehand drawing
+  - Image overlay with drag/resize
+  - Snapshot capture for AI context
+- **Voice**: ✅ **OpenAI TTS API** + **Web Speech API**
+  - OpenAI TTS for text-to-speech (high quality)
+  - Web Speech API for speech-to-text
+  - LaTeX to speech conversion
+- **Avatar**: ✅ **CSS/SVG animations**
+  - Speaking animation synced to audio levels
+  - Web Audio API for real-time audio monitoring
 - **UI Design**: Sketch/doodle style throughout
   - Refined borders (less intrusive than original)
   - Hand-drawn aesthetic with organic shapes
@@ -34,15 +46,17 @@
   - Simple, fast setup for single-day build
   - Easier debugging than serverless functions
 - **API Routes** in `backend/routes/`:
-  - `/api/chat` - Socratic dialogue generation (✅ implemented)
+  - `/api/chat` - Socratic dialogue generation with whiteboard support (✅ implemented)
   - `/api/vision` - Image OCR extraction (✅ implemented)
   - `/api/validate` - Answer validation (✅ implemented)
+  - `/api/tts` - Text-to-speech using OpenAI TTS API (✅ implemented)
 - **Shared Utilities** in `backend/lib/`:
   - `orchestrator.js` - Socratic dialogue logic with stuck detection and output filtering
   - `validation.js` - Answer validation and stuck detection utilities
   - `openai.js` - OpenAI client setup
 - **Security**: API keys stored in backend `.env` file (local) or platform env vars (production)
 - **CORS**: Configured to allow requests from frontend URL
+- **Body Size Limits**: 50MB limit for JSON and URL-encoded data (handles large images/whiteboard snapshots)
 
 ### Database
 - **Options**: Postgres or Firestore
@@ -64,6 +78,23 @@
   - Validates numeric and algebraic answers
   - Evaluates correctness for both simple and complex problems
   - No separate math library needed for MVP
+
+### Voice & Speech
+- ✅ **OpenAI TTS API**
+  - High-quality text-to-speech
+  - Multiple voice options
+  - Supports long text with proper pauses
+- ✅ **Web Speech API**
+  - Browser-native speech recognition
+  - Real-time speech-to-text conversion
+  - Cross-browser compatibility considerations
+
+### Canvas & Drawing
+- ✅ **Konva.js (via react-konva)**
+  - 2D canvas library for drawing tools
+  - Transform support for drag/resize
+  - Snapshot capture for image export
+  - Image overlay capabilities
 
 ### Deployment
 - **Frontend**: ✅ **Vercel** (static React build)
@@ -124,7 +155,9 @@
 ### Frontend Dependencies
 - **React** (via Vite or Create React App)
 - **Tailwind CSS** (required for sketch-style UI)
-- KaTeX or MathJax
+- **KaTeX** (react-katex) - Math rendering
+- **Konva.js** (react-konva) - Whiteboard drawing
+- **use-image** - Image loading for Konva
 - HTTP client (fetch or axios)
 - Image upload library (react-dropzone or similar)
 
@@ -133,7 +166,6 @@
 - **OpenAI SDK** (openai npm package) - for API calls
 - **cors** - for CORS configuration (allows frontend requests)
 - **dotenv** (environment variable management) - for local development
-- **multer** (optional, for Phase 2 image uploads) - or use FormData/Base64
 - Database client (optional for MVP)
 
 ### Development Dependencies

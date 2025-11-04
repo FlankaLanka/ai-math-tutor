@@ -9,7 +9,7 @@ const router = express.Router();
  */
 router.post('/chat', async (req, res) => {
   try {
-    const { message, image, conversationHistory = [], problem } = req.body;
+    const { message, image, whiteboard, conversationHistory = [], problem } = req.body;
 
     // Validate required fields - allow message OR image
     if (!message && !image) {
@@ -26,8 +26,9 @@ router.post('/chat', async (req, res) => {
     }
 
     // Create orchestrator and generate response
+    // If whiteboard flag is true, this is a whiteboard snapshot, otherwise it's a regular image
     const orchestrator = createOrchestrator(problem, conversationHistory);
-    const response = await orchestrator.generateResponse(message || '', image);
+    const response = await orchestrator.generateResponse(message || '', image, whiteboard || false);
 
     return res.status(200).json({
       reply: response.reply,

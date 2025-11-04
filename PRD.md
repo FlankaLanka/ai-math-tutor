@@ -224,6 +224,36 @@ This PRD covers the **core features and extended enhancements**, including step 
 - Allow student to start a new tutoring session with the generated problem.
 - Helps students practice and reinforce learning.
 
+**FR-15. Interactive Whiteboard**
+- **Purpose**: Allow students to draw and visualize their work while solving problems.
+- **Location**: Separate whiteboard panel underneath the chat interface.
+- **Drawing Tools**:
+  - Simple pen tool for freehand drawing
+  - Ability to render and overlay the problem image (if image was uploaded)
+  - Image overlay can be moved and scaled by the student
+- **Problem Image Integration**:
+  - If a problem was uploaded as an image, student can add it to the whiteboard as a texture/background
+  - Image can be repositioned and resized on the canvas
+  - Student can draw over the image
+- **Agent Visibility**:
+  - AI tutor can see the whiteboard state
+  - When student sends a message, a snapshot of the current whiteboard is automatically captured and sent along with the text
+  - Agent receives whiteboard image for visual context of student's work
+- **Implementation**:
+  - HTML5 Canvas for drawing functionality
+  - Canvas-based drawing tools (pen/stroke)
+  - Image overlay support with drag and resize capabilities
+  - Automatic snapshot capture on message send
+  - Sketch-style UI aesthetic to match overall design
+- **User Interaction**:
+  - Only student can draw and interact with whiteboard
+  - Agent can view but cannot draw or manipulate the canvas
+- **Technical Stack**:
+  - HTML5 Canvas API for drawing
+  - React Canvas components
+  - Image manipulation for overlay functionality
+  - Base64 encoding for snapshot transmission
+
 ---
 
 ## 5. Non-Functional Requirements
@@ -244,11 +274,12 @@ This PRD covers the **core features and extended enhancements**, including step 
 
 **NFR-4. Maintainability**
 - Clear modular separation:
-  - Frontend UI (Tailwind CSS with sketch-style components, step visualization, voice interface, avatar)
+  - Frontend UI (Tailwind CSS with sketch-style components, step visualization, voice interface, avatar, whiteboard)
   - Backend API (Express.js server)
   - LLM/Socratic orchestrator (OpenAI GPT-4 integration)
   - OCR/vision integration (OpenAI GPT-4 Vision)
   - Problem generation module (OpenAI GPT-4)
+  - Whiteboard module (HTML5 Canvas, drawing tools, image overlay)
 - Config-driven prompts, hint behaviors, and OpenAI model parameters (temperature, max_tokens, etc.).
 - Tailwind CSS for consistent, maintainable styling with sketch-style utility patterns.
 
@@ -266,9 +297,9 @@ This PRD covers the **core features and extended enhancements**, including step 
 
 ## 6. Out of Scope (Future / Stretch)
 
-- Interactive whiteboard (drawings, shapes).
 - Difficulty modes by grade level.
 - Advanced personalization and adaptive learning algorithms.
+- Advanced whiteboard features (shapes, text tools, multiple layers, etc.).
 
 These can be added as v2+ once the core Socratic tutor is stable.
 

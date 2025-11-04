@@ -17,19 +17,21 @@ CRITICAL RULES (MUST FOLLOW):
 7. When a student answers correctly, acknowledge and move to the next step
 8. When a student answers incorrectly, give gentle feedback and ask a simpler question
 9. When a student shares an image (graph, diagram, work, etc.), you CAN see it and should reference specific details from the image in your guidance
-10. For graph problems, help students identify key features like intercepts, shape, end behavior, and relate them to function properties
-11. For multiple-choice questions with graphs, guide students to analyze the graph characteristics and match them to the function options
+10. CRITICAL FOR WHITEBOARD SNAPSHOTS: When a student shares a whiteboard snapshot, you MUST carefully read EVERYTHING written on it. Read all equations, numbers, and text exactly as they appear. Do NOT trust what the student says verbally - only trust what you can actually see written on the whiteboard. If the student describes one thing but the whiteboard shows something different, believe the whiteboard. Verify each step by reading what's actually written, not what the student claims they wrote.
+11. For graph problems, help students identify key features like intercepts, shape, end behavior, and relate them to function properties
+12. For multiple-choice questions with graphs, guide students to analyze the graph characteristics and match them to the function options
 
 VALIDATION AND CORRECTION RULES (CRITICAL - MUST FOLLOW):
-12. NEVER affirm a student answer without first verifying it against the actual problem statement, image, diagram, or given information
-13. When a student provides an answer, ALWAYS check it against what you can see in the problem/image/data before responding
-14. If you cannot verify an answer is correct, DO NOT affirm it - instead ask them to verify, recalculate, or look more carefully
-15. For problems with images/diagrams: You CAN see the image - carefully verify all details (coordinates, measurements, labels, etc.) before confirming any answer
-16. If a student gives an answer that doesn't match what you can verify, DO NOT say "Great!" or "Yes!" - instead guide them to check their work or reconsider
-17. Use phrases like "Let's verify that together" or "Can you walk me through how you got that?" instead of immediately confirming
-18. If a student gives an incorrect answer, respond with: "Let's check that step by step" or "Can you double-check your work?" - NEVER affirm incorrect answers
-19. Only use affirmative language ("Yes!", "Great!", "Perfect!") when you have verified the answer is ACTUALLY correct by checking the problem/image/calculations
-20. When in doubt about an answer's correctness, default to asking the student to verify, explain their reasoning, or recalculate rather than affirming
+13. NEVER affirm a student answer without first verifying it against the actual problem statement, image, diagram, or given information
+14. When a student provides an answer, ALWAYS check it against what you can see in the problem/image/data before responding
+15. If you cannot verify an answer is correct, DO NOT affirm it - instead ask them to verify, recalculate, or look more carefully
+16. For problems with images/diagrams: You CAN see the image - carefully verify all details (coordinates, measurements, labels, etc.) before confirming any answer
+17. FOR WHITEBOARD SNAPSHOTS: Read the whiteboard image carefully and verify what's ACTUALLY written. If the student says "I got 2x = 20" but the whiteboard shows "2x = 10", the whiteboard is correct - do not affirm the verbal description. Always verify by reading what's written, not by trusting verbal descriptions.
+18. If a student gives an answer that doesn't match what you can verify, DO NOT say "Great!" or "Yes!" - instead guide them to check their work or reconsider
+19. Use phrases like "Let's verify that together" or "Can you walk me through how you got that?" instead of immediately confirming
+20. If a student gives an incorrect answer, respond with: "Let's check that step by step" or "Can you double-check your work?" - NEVER affirm incorrect answers
+21. Only use affirmative language ("Yes!", "Great!", "Perfect!") when you have verified the answer is ACTUALLY correct by checking the problem/image/calculations
+22. When in doubt about an answer's correctness, default to asking the student to verify, explain their reasoning, or recalculate rather than affirming
 
 HINT ESCALATION STRATEGY:
 - After 2+ stuck signals: Provide a concrete partial step (e.g., "Try isolating x on one side" not "x = 5")
@@ -104,9 +106,10 @@ export function createOrchestrator(problem, conversationHistory = []) {
     /**
      * Generate a Socratic response to the student's message
      * @param {string} userMessage - The user's message
-     * @param {string} image - Optional base64 image data URL
+     * @param {string} image - Optional base64 image data URL (can be problem image or whiteboard snapshot)
+     * @param {boolean} isWhiteboard - Whether the image is a whiteboard snapshot
      */
-    async generateResponse(userMessage, image = null) {
+    async generateResponse(userMessage, image = null, isWhiteboard = false) {
       const openai = getOpenAIClient();
       
       // Detect if student is stuck
@@ -168,15 +171,25 @@ export function createOrchestrator(problem, conversationHistory = []) {
       }
 
       // Add current user message with optional image
-      // Only include image if it's a NEW image (not the reference image)
+      // Handle whiteboard snapshots differently from regular images
       if (image && image !== referenceImageFromHistory) {
-        // New image attached by user
-        const textPrompt = userMessage || 'I need help with this image.';
-        const userContent = [
-          { type: 'text', text: textPrompt },
-          { type: 'image_url', image_url: { url: image } }
-        ];
-        messages.push({ role: 'user', content: userContent });
+        if (isWhiteboard) {
+          // Whiteboard snapshot - include with context about student's work
+          const textPrompt = userMessage || 'I\'m working on this problem on the whiteboard.';
+          const userContent = [
+            { type: 'text', text: `${textPrompt}\n\nCRITICAL: This is a snapshot of the student's whiteboard showing their actual written work. You MUST carefully read and verify EVERYTHING written on the whiteboard image. Read all equations, numbers, and text exactly as they appear. DO NOT trust the student's verbal description - only trust what you can actually see written on the whiteboard. If the student says one thing but the whiteboard shows something different, believe the whiteboard. Verify each step of their work by reading what's actually written. If you see "2x = 10" on the whiteboard, that is what they wrote - do not interpret it as "2x = 20" or any other number. Read carefully and verify before providing feedback.` },
+            { type: 'image_url', image_url: { url: image } }
+          ];
+          messages.push({ role: 'user', content: userContent });
+        } else {
+          // New image attached by user (regular image upload)
+          const textPrompt = userMessage || 'I need help with this image.';
+          const userContent = [
+            { type: 'text', text: textPrompt },
+            { type: 'image_url', image_url: { url: image } }
+          ];
+          messages.push({ role: 'user', content: userContent });
+        }
       } else {
         // Regular text message (reference image already in system context)
         messages.push({ role: 'user', content: userMessage || '' });
