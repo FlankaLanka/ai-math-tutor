@@ -1,0 +1,54 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import chatRoutes from './routes/chat.js';
+import visionRoutes from './routes/vision.js';
+import validateRoutes from './routes/validate.js';
+import ttsRoutes from './routes/tts.js';
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// Middleware
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
+app.use(express.json());
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', message: 'AI Math Tutor API is running' });
+});
+
+// API Routes
+app.use('/api', chatRoutes);
+app.use('/api', visionRoutes);
+app.use('/api', validateRoutes);
+app.use('/api', ttsRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    error: err.message || 'Internal server error' 
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+  console.log(`📝 Health check: http://localhost:${PORT}/health`);
+  console.log(`📸 Vision endpoint: http://localhost:${PORT}/api/vision`);
+  console.log(`💬 Chat endpoint: http://localhost:${PORT}/api/chat`);
+  console.log(`✅ Validation endpoint: http://localhost:${PORT}/api/validate`);
+  console.log(`🔊 TTS endpoint: http://localhost:${PORT}/api/tts`);
+});
+
