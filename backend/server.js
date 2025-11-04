@@ -45,12 +45,18 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
-  console.log(`📝 Health check: http://localhost:${PORT}/health`);
-  console.log(`📸 Vision endpoint: http://localhost:${PORT}/api/vision`);
-  console.log(`💬 Chat endpoint: http://localhost:${PORT}/api/chat`);
-  console.log(`✅ Validation endpoint: http://localhost:${PORT}/api/validate`);
-  console.log(`🔊 TTS endpoint: http://localhost:${PORT}/api/tts`);
-});
+// Export for Vercel serverless function
+export default app;
+
+// Start server for local development
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+    console.log(`📝 Health check: http://localhost:${PORT}/health`);
+    console.log(`📸 Vision endpoint: http://localhost:${PORT}/api/vision`);
+    console.log(`💬 Chat endpoint: http://localhost:${PORT}/api/chat`);
+    console.log(`✅ Validation endpoint: http://localhost:${PORT}/api/validate`);
+    console.log(`🔊 TTS endpoint: http://localhost:${PORT}/api/tts`);
+  });
+}
 
