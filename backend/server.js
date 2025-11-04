@@ -6,8 +6,11 @@ import visionRoutes from './routes/vision.js';
 import validateRoutes from './routes/validate.js';
 import ttsRoutes from './routes/tts.js';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables (only needed for local development)
+// Vercel provides env vars automatically, so this is optional
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  dotenv.config();
+}
 
 const app = express();
 const PORT = process.env.PORT || 8000;
