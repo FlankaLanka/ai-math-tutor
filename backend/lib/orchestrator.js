@@ -187,7 +187,7 @@ export function createOrchestrator(problem, conversationHistory = []) {
           const userContent = [
             { type: 'text', text: textPrompt },
             { type: 'image_url', image_url: { url: image } }
-          ];
+      ];
           messages.push({ role: 'user', content: userContent });
         }
       } else {
